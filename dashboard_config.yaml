@@ -1,0 +1,59 @@
+dashboard_title: Crypto Market Volatility & Liquidity Overview
+description: Executive BI dashboard built in Apache Superset on top of PostgreSQL DWH
+css: ''
+slug: crypto-market-overview
+certified_by: Data Engineering Portfolio
+certification_details: Verified semantic layer and SQL metrics
+
+charts:
+  - slice_name: Total Market Cap ($)
+    viz_type: big_number
+    metric: SUM(market_cap)
+    granularity_sqla: snapshot_date
+    time_range: Last 30 days
+
+  - slice_name: 24h Trading Volume ($)
+    viz_type: big_number
+    metric: SUM(total_volume)
+    granularity_sqla: snapshot_date
+    time_range: Last 30 days
+
+  - slice_name: Price vs 7-Day Moving Average
+    viz_type: echarts_timeseries_line
+    metrics:
+      - AVG(close_price)
+      - AVG(ma_7_price)
+    groupby:
+      - symbol
+    granularity_sqla: snapshot_date
+    time_range: Last 30 days
+
+  - slice_name: Risk vs Liquidity Matrix
+    viz_type: bubble
+    series: symbol
+    entity: symbol
+    x: avg_volatility_pct
+    y: avg_turnover_pct
+    size: avg_market_cap
+    max_bubble_size: '50'
+
+  - slice_name: Market Performance Summary
+    viz_type: pivot_table_v2
+    groupbyRows:
+      - symbol
+    metrics:
+      - AVG(close_price)
+      - AVG(daily_return_pct)
+      - AVG(price_spread_pct)
+      - SUM(total_volume)
+
+native_filters:
+  - name: Date Range
+    filter_type: filter_time
+    default_value: Last 30 days
+  - name: Cryptocurrency
+    filter_type: filter_select
+    column: symbol
+  - name: Market Cap Tier
+    filter_type: filter_select
+    column: tier_group
